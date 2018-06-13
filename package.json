@@ -21,5 +21,18 @@
   "bugs": {
     "url": "https://github.com/maksimkurb/node-robokassa.js/issues"
   },
-  "homepage": "https://github.com/maksimkurb/node-robokassa.js#readme"
+  "homepage": "https://github.com/maksimkurb/node-robokassa.js#readme",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "jest": "^23.1.0",
+    "prettier": "^1.13.5"
+  },
+  "dependencies": {
+    "apisauce": "^0.15.2",
+    "axios": "^0.18.0",
+    "query-string": "^6.1.0",
+    "xml2js": "^0.4.19"
+  }
 }
