@@ -1,6 +1,9 @@
 {
   "name": "robokassa.js",
   "version": "0.1.0",
+  "engines": {
+    "node": ">=6.4.0"
+  },
   "description": "Robokassa merchant for node",
   "main": "index.js",
   "scripts": {
