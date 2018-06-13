@@ -1,0 +1,25 @@
+{
+  "name": "robokassa.js",
+  "version": "0.1.0",
+  "description": "Robokassa merchant for node",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maksimkurb/node-robokassa.js.git"
+  },
+  "keywords": [
+    "robokassa",
+    "payment",
+    "api",
+    "merchant"
+  ],
+  "author": "Maxim Kurbatov <maksimkurb@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maksimkurb/node-robokassa.js/issues"
+  },
+  "homepage": "https://github.com/maksimkurb/node-robokassa.js#readme"
+}
