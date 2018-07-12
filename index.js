@@ -17,7 +17,7 @@ const defaultConfig = {
 
 const create = (opts = defaultConfig) => {
   const options = Object.assign({}, defaultConfig, opts);
-  if (opts.hashingMethod !== "sha256") {
+  if (options.hashingMethod !== "sha256") {
     throw new Error("Sorry, robokassa.js supports SHA256 only hashes for now.");
   }
   if (!opts.merchantLogin || !opts.password1 || !opts.password2) {
