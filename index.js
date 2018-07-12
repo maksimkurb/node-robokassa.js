@@ -65,26 +65,80 @@ const create = (opts = defaultConfig) => {
       .digest("hex");
   };
 
+  const arrToObj = arr =>
+    arr.reduce((obj, [key, val]) => ({ ...obj, [key]: val }), {});
+
+  const userParamsSanitize = obj => {
+    if (!obj) return [];
+    return Object.entries(obj)
+      .sort(([a], [b]) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      })
+      .map(([key, val]) => [`Shp_${key}`, encodeURIComponent(val)]);
+  };
+
+  const userParamsExtract = obj => {
+    if (!obj) return [];
+    return Object.entries(obj)
+      .filter(([key]) => key.startsWith("Shp_"))
+      .sort(([a], [b]) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      });
+  };
+
+  const getUserParams = obj => {
+    return userParamsExtract(obj).map(v => {
+      v[0] = v[0].substr(4); // remove Shp_
+      return v;
+    });
+  };
+
   /**
    * Generate payment URL
    * @param {number} amount Payment amount (in rubles)
    * @param {string} description Payment description
-   * @param {any} invoiceID Invoice ID. If 0, then Robokassa will assign invoice ID automatically
+   * @param {object} opts Options
+   * @param {number} opts.invoiceID Invoice ID. If 0, then Robokassa will assign invoice ID automatically
+   * @param {number} opts.userParams Custom data
    */
-  const generatePaymentUrl = (amount, description, invoiceID = 0) => {
-    const hash = calcHash(
-      `${options.merchantLogin}:${amount}:${invoiceID}:${options.password1}`
-    );
+  const generatePaymentUrl = (amount, description, opts) => {
+    const userParams =
+      opts && opts.userParams ? userParamsSanitize(opts.userParams) : [];
+    const invoiceID = (opts && opts.invoiceID) || 0;
     const args = {
       MerchantLogin: options.merchantLogin,
       OutSum: amount,
       InvoiceID: invoiceID,
       Description: description,
       Language: options.language,
-      SignatureValue: hash,
+      ...(options.isTest ? { IsTest: 1 } : {}),
+      ...arrToObj(userParams)
     };
-    if (options.isTest) args.IsTest = 1;
+    let hashPayload = [
+      options.merchantLogin,
+      amount,
+      invoiceID,
+      options.password1,
+      ...userParams.map(([k, v]) => `${k}=${v}`)
+    ];
+    args.SignatureValue = calcHash(hashPayload.join(":"));
     return `${options.paymentURL}?${qs.stringify(args)}`;
+  };
+
+  const checkPayment = params => {
+    const userParams = userParamsExtract(params);
+    let hashPayload = [
+      params.OutSumm,
+      params.InvId,
+      options.password2,
+      ...userParams.map(([k, v]) => `${k}=${v}`)
+    ];
+    const hash = calcHash(hashPayload.join(":"));
+    return hash.toLowerCase() === params.SignatureValue.toLowerCase();
   };
 
   /**
@@ -133,7 +187,9 @@ const create = (opts = defaultConfig) => {
     getPaymentMethods,
     getAmountPlusCharges,
     getAmountMinusCharges,
-    getPaymentStatus
+    getPaymentStatus,
+    checkPayment,
+    getUserParams
   };
 };
 
