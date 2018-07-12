@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const qs = require("query-string");
 const apisauce = require("apisauce");
-const xml2js = require("xml2js");
+const parseXML = require("xml2js").parseString;
 
 const defaultConfig = {
   baseURL: "https://auth.robokassa.ru/Merchant/WebService/Service.asmx",
@@ -27,13 +27,28 @@ const create = (opts = defaultConfig) => {
 
   const api = apisauce.create({
     baseURL: options.baseURL,
-    timeout: options.timeout
+    timeout: options.timeout,
+    headers: {
+      Accept: "application/xml",
+      "Content-Type": "text/plain"
+    }
   });
 
   api.addRequestTransform(request => {
     const { params } = request;
     params.MerchantLogin = options.merchantLogin;
     params.Language = options.language;
+    console.log(request);
+  });
+
+  api.addResponseTransform(response => {
+    return new Promise((resolve, reject) => {
+      parseXML(response.data, (err, result) => {
+        if (err) return reject(err);
+        response.data = result;
+        resolve(response);
+      });
+    });
   });
 
   const calcHash = payload => {
