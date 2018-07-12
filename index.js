@@ -11,6 +11,7 @@ const defaultConfig = {
   password1: null,
   password2: null,
   hashingMethod: "sha256",
+  isTest: false,
   timeout: 10000
 };
 
@@ -38,7 +39,13 @@ const create = (opts = defaultConfig) => {
     const { params } = request;
     params.MerchantLogin = options.merchantLogin;
     params.Language = options.language;
-    console.log(request);
+    if (
+      params.hasOwnProperty &&
+      !params.hasOwnProperty("IsTest") &&
+      options.isTest
+    ) {
+      params.IsTest = options.isTest ? 1 : 0;
+    }
   });
 
   api.addResponseTransform(response => {
