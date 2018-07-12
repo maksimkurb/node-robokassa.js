@@ -81,8 +81,9 @@ const create = (opts = defaultConfig) => {
       InvoiceID: invoiceID,
       Description: description,
       Language: options.language,
-      SignatureValue: hash
+      SignatureValue: hash,
     };
+    if (options.isTest) args.IsTest = 1;
     return `${options.paymentURL}?${qs.stringify(args)}`;
   };
 
