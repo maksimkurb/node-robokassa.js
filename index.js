@@ -131,8 +131,18 @@ const create = (opts = defaultConfig) => {
 
   const checkPayment = params => {
     const userParams = userParamsExtract(params);
+    if (
+      typeof params !== "object" ||
+      !params.hasOwnProperty("OutSum") ||
+      !params.hasOwnProperty("InvId") ||
+      !params.hasOwnProperty("SignatureValue")
+    ) {
+      throw new Error(
+        "ResultURL payload is not complete. Required fields: OutSum, InvId, SignatureValue"
+      );
+    }
     let hashPayload = [
-      params.OutSumm,
+      params.OutSum,
       params.InvId,
       options.password2,
       ...userParams.map(([k, v]) => `${k}=${v}`)
